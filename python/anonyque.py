@@ -40,10 +40,10 @@ def main():
                 else:
                     pasteids = []
             else:
-                tmpid = ''.join([row[x] for x in pasteids]).lower()+''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(idlen))
+                tmpid = '_'.join(filter(None, [''.join([row[x] for x in pasteids]).lower(), ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(idlen))]))
                 while tmpid in uniqueids.values():
                     print(f'{tmpid} already used, re-generate')
-                    tmpid = ''.join([row[x] for x in pasteids]).lower()+''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(idlen))
+                    tmpid = '_'.join(filter(None, [''.join([row[x] for x in pasteids]).lower(), ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(idlen))]))
                 uniqueids[row[k]] = tmpid
             l += 1
         print(uniqueids)
