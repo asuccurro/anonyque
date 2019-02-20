@@ -32,8 +32,17 @@ def uniqueids(args):
     pasteids = args.pasteids.split(';')
     idlen = int(args.lenghtid)
     skipentry = []
+    updating = False
 
-    uniqueids = {}
+    try:
+        tmpfile = open(args.infilename.replace('.csv', '_dict.json'), 'r')
+        if verbose:
+            print(f'A dictionary already exists: the previous IDs will be maintained and only new entries will be added')
+        updating = True
+        uniqueids = json.load(tmpfile)
+    except:
+        uniqueids = {}
+        
     with open(args.infilename) as infile:
         csvr = csv.reader(infile, delimiter=mydel)
         l = 0
@@ -45,28 +54,40 @@ def uniqueids(args):
                 except:
                     print(f'{mykey} is not in the column names, fix the input or choose a new key among: {", ".join(header)}')
                     return
-                print(f'Assigning a unique identifier to {header[k]}')
+                if verbose:
+                    print(f'Assigning a unique identifier to {header[k]}')
                 if len(pasteids[0]) > 0:
-                    print(f'The unique identifier will also contain the fields: {", ".join(pasteids)}')
+                    if verbose:
+                        print(f'The unique identifier will also contain the fields: {", ".join(pasteids)}')
                     pasteids = [header.index(x) for x in pasteids]
                 else:
                     pasteids = []
             else:
                 if row[k] in uniqueids.keys():
-                    print(f'***WARNING*** duplicated {header[k]} {row[k]}, skipping!')
+                    if verbose:
+                        print(f'***WARNING*** {header[k]} {row[k]} already has an ID, skipping!')
                     skipentry.append(l)
-                    continue
-                tmpid = '_'.join(getIDParts(row, pasteids, idlen))
-                while tmpid in uniqueids.values():
-                    print(f'{tmpid} already used, re-generate')
+                else:
                     tmpid = '_'.join(getIDParts(row, pasteids, idlen))
-                uniqueids[row[k]] = tmpid
+                    while tmpid in uniqueids.values():
+                        if verbose:
+                            print(f'{tmpid} already used, re-generate')
+                        tmpid = '_'.join(getIDParts(row, pasteids, idlen))
+                    uniqueids[row[k]] = tmpid
             l += 1
 
-    with open(args.outfilename, 'w') as ofile:
+    if updating:
+        fname = args.infilename.replace('.csv', '_wIDs_new.csv').replace('/input/', '/output/')
+    else:
+        fname = args.infilename.replace('.csv', '_wIDs.csv').replace('/input/', '/output/')
+        
+    with open(args.infilename.replace('.csv', '_dict.json').replace('/input/', '/output/'), 'w') as ofile:
         json.dump(uniqueids, ofile)
 
-    with open(args.infilename.replace('.csv', '_wIDs.csv').replace('/input/', '/output/'), 'w') as ofile:
+    with open(args.infilename.replace('.csv', '_uniqueIDs.json').replace('/input/', '/output/'), 'w') as ofile:
+        json.dump(list(uniqueids.values()), ofile)
+
+    with open(fname, 'w') as ofile:
         with open(args.infilename) as infile:
             csvr = csv.reader(infile, delimiter=mydel)
             l = 0
