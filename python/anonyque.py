@@ -22,6 +22,52 @@ def main():
     if args.generate:
         uniqueids(args)
 
+    if args.check:
+        checkunique(args)
+
+def checkunique(args):
+    '''
+    Check a list of IDs (from a csv file with args.key as corresponding column name) against a saved json list
+    '''
+    verbose = args.verbose
+    mydel = args.delimiter
+    mykey = args.key
+    myids = []
+    
+    with open(args.jsonfilename, 'r') as infile:
+        validid = json.load(infile)
+        valididset = set(validid)
+
+    with open(args.infilename, 'r') as infile:
+        csvr = csv.reader(infile, delimiter=mydel)        
+        l = 0
+        for row in csvr:
+            if l < 1:
+                header = row
+                try:
+                    k = header.index(mykey)
+                except:
+                    print(f'{mykey} is not in the column names, fix the input or choose a new key among: {", ".join(header)}')
+                    return
+                if verbose:
+                    print(f'Checking that unique {header[k]} matches recognised values')
+            else:
+                myids.append(row[k])
+            l += 1
+
+    myidset = set(myids)
+
+    # These are the ids that are not found among the valid ones
+    notvalid = myidset - valididset
+    print(f'These IDs are *not* valid: {", ".join(notvalid)}')
+
+    
+    # These are the valid IDs that are not in the input file
+    missing = valididset - myidset
+    print(f'These IDs are valid and missing in the input: {", ".join(missing)}')
+
+    return 
+
 def uniqueids(args):
     '''
     Read csv file

@@ -2,6 +2,7 @@
 
 Code to be used for different scenarios.
 
+## Setup
 
 ```bash 
 virtualenv -p /usr/bin/python3 venvpy3
@@ -17,6 +18,7 @@ This example uses the `input/test.csv` file (with fields "Nome", "Cognome", "ema
 
 ```
 	
-## Online anonymous, unique votes
+## Use case: Online anonymous, unique votes
 
-## Online unique completion of surveys
+## Use case: Online unique completion of surveys
+
