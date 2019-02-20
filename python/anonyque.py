@@ -12,6 +12,7 @@ import argparse
 import csv
 import random
 import string
+import unidecode
 
 def main():
 
@@ -30,6 +31,7 @@ def uniqueids(args):
     mykey = args.key
     pasteids = args.pasteids.split(';')
     idlen = int(args.lenghtid)
+    skipentry = []
 
     uniqueids = {}
     with open(args.infilename) as infile:
@@ -50,10 +52,14 @@ def uniqueids(args):
                 else:
                     pasteids = []
             else:
-                tmpid = '_'.join(filter(None, [''.join([row[x] for x in pasteids]).lower(), ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(idlen))]))
+                if row[k] in uniqueids.keys():
+                    print(f'***WARNING*** duplicated {header[k]} {row[k]}, skipping!')
+                    skipentry.append(l)
+                    continue
+                tmpid = '_'.join(getIDParts(row, pasteids, idlen))
                 while tmpid in uniqueids.values():
                     print(f'{tmpid} already used, re-generate')
-                    tmpid = '_'.join(filter(None, [''.join([row[x] for x in pasteids]).lower(), ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(idlen))]))
+                    tmpid = '_'.join(getIDParts(row, pasteids, idlen))
                 uniqueids[row[k]] = tmpid
             l += 1
 
@@ -70,12 +76,20 @@ def uniqueids(args):
                     row.append('UniqueID')
                 else:
                     row.append(uniqueids[row[k]])
-                ofile.write(f'{",".join(row)}\n')
+                if l not in skipentry:
+                    ofile.write(f'{",".join(row)}\n')
                 l+=1
-                    
 
-            
-                    
+    return
+
+def getIDParts(mystr, compstr, mylen):
+    '''
+    Return a list of the strings that will compose the ID, starting from a set of pre-defined components (<compstr> list of indexes) and adding a random string of length <mylen>
+    The German umlauts are replaced with the alternative writing, all other special letters are simplified by the unidecode function
+    '''
+    return filter(None, [''.join([unidecode.unidecode(mystr[x].replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')) for x in compstr]).lower(),
+                         ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(mylen))])
+
 def options():
     '''in-line arguments read by the parser'''
     parser = argparse.ArgumentParser(description='Parsing options')
