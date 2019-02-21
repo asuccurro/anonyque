@@ -92,7 +92,7 @@ def main():
                             print(f'***WARNING*** {nm_srnm} matches more emails and could not match both name and surname\n')
                             print(srnm_emails[nm_srnm])
                     else:
-                        row.append(e)
+                        row.append(srnm_emails[nm_srnm][0])
                         ofile.write(f'{",".join(row)}\n')
             l +=1 
 
