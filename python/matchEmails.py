@@ -68,10 +68,13 @@ def main():
                     if match < 1:
                         rematch = 0
                         for e in emails:
-                            if tryMatch(' ', srnm, e):
+                            if tryMatchSep(' ', srnm, e):
                                 rematch += 1
                                 row.append(e)
-                            if tryMatch('-', srnm, e):
+                            if tryMatchSep('-', srnm, e):
+                                rematch += 1
+                                row.append(e)
+                            if rematch < 1 and tryMatchRed(srnm, e):
                                 rematch += 1
                                 row.append(e)
                         if rematch == 1:
@@ -96,23 +99,41 @@ def main():
                         ofile.write(f'{",".join(row)}\n')
             l +=1 
 
-    strunmt="\n\t".join(unmatched_names)
-    print(f'***WARNING*** these names did not match any email:\n\t{strunmt}\n')
+    ofile.close()
 
-    print("\n")
+    if len(unmatched_names) > 0:
+        strunmt="\n\t".join(unmatched_names)
+        print(f'***WARNING*** these names did not match any email:\n\t{strunmt}\n')
+    else:
+        print(f'* All names were matched to emails :)')
+
+
     for e in emails:
         if not emails_srnm.get(e, False):
-            print(f'***WARNING*** {e} does not match any name')
+            unmatched_emails.append(e)
         # if emails_srnm.get(e, False):
         #     if len(emails_srnm[e]) > 1:
         #         print(f'***WARNING*** {e} matches more names')
         #         print(emails_srnm[e])
         # else:
         #     print(f'***WARNING*** {e} does not match any name')
-    ofile.close()
+
+    print("\n")
+
+    if len(unmatched_emails) > 0:
+        strunmt="\n\t".join(unmatched_emails)
+        print(f'***WARNING*** these emails did not match any name:\n\t{strunmt}\n')
+    
     return
 
-def tryMatch(sep, srnm, email):
+def tryMatchRed(srnm, email):
+    if len(srnm) > 7:
+        if srnm[:7] in email:
+            print(f'* Please cross-check: matched "{srnm}" with {email}\n')
+            return True
+    return False
+
+def tryMatchSep(sep, srnm, email):
     sn = srnm.split(sep)
     m = 0
     for s in sn:
