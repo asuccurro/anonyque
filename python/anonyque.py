@@ -25,6 +25,8 @@ def main():
     if args.check:
         checkunique(args)
 
+    return
+
 def checkunique(args):
     '''
     Check a list of IDs (from a csv file with args.key as corresponding column name) against a saved json list
