@@ -95,7 +95,11 @@ def main():
                             print(f'***WARNING*** {nm_srnm} matches more emails and could not match both name and surname\n')
                             print(srnm_emails[nm_srnm])
                     else:
-                        row.append(srnm_emails[nm_srnm][0])
+                        tmpe = srnm_emails[nm_srnm][0]
+                        nmsrnme = tmpe.split('@')[0].split('.')
+                        if len(nmsrnme) > 1 and nm not in tmpe:
+                            print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" does not match\n') 
+                        row.append(tmpe)
                         ofile.write(f'{",".join(row)}\n')
             l +=1 
 
@@ -129,7 +133,7 @@ def main():
 def tryMatchRed(srnm, email):
     if len(srnm) > 7:
         if srnm[:7] in email:
-            print(f'* Please cross-check: matched "{srnm}" with {email}\n')
+            print(f'* Please cross-check: matched "{srnm}" abbreviated with {email}\n')
             return True
     return False
 
@@ -139,7 +143,7 @@ def tryMatchSep(sep, srnm, email):
     for s in sn:
         if len(s) > 3:
             if s in email:
-                print(f'* Please cross-check: matched "{srnm}" with {email}\n')
+                print(f'* Please cross-check: matched "{srnm}" composed with {email}\n')
                 m +=1
     if m == 1:
         return True
