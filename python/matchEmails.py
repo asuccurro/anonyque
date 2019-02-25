@@ -14,8 +14,13 @@ import random
 import string
 import unidecode
 
+ROWWARN=''
+
+
 def main():
 
+    global ROWWARN
+    
     emailfile = "../input/wggc_emails.csv"
     namesfile = "../input/wggc_names.csv"
 
@@ -45,6 +50,7 @@ def main():
                 row.append("email")
                 ofile.write(f'{",".join(row)}\n')
             else:
+                ROWWARN=''
                 nm = row[kn].lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
                 srnm = row[ks].lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
                 nm_srnm = f'{nm}_{srnm}'
@@ -78,7 +84,7 @@ def main():
                                 rematch += 1
                                 row.append(e)
                         if rematch == 1:
-                            ofile.write(f'{",".join(row)}\n')
+                            ofile.write(f'{ROWWARN}{",".join(row)}\n')
                             emails_srnm[row[-1]] = [nm_srnm]
                         else:
                             unmatched_names.append(nm_srnm)
@@ -89,18 +95,24 @@ def main():
                                 rematch += 1
                                 row.append(e)
                         if rematch == 1:
-                            ofile.write(f'{",".join(row)}\n')
+                            ofile.write(f'{ROWWARN}{",".join(row)}\n')
                             emails_srnm[row[-1]] = [nm_srnm]
                         else:
-                            print(f'***WARNING*** {nm_srnm} matches more emails and could not match both name and surname\n')
+                            print(f'***WARNING*** {nm_srnm} matches more emails and could not univocally match name and surname\n')
                             print(srnm_emails[nm_srnm])
                     else:
                         tmpe = srnm_emails[nm_srnm][0]
                         nmsrnme = tmpe.split('@')[0].split('.')
-                        if len(nmsrnme) > 1 and nm not in tmpe:
-                            print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" does not match\n') 
+                        if len(nmsrnme[0]) == 1:
+                            if nm[0] != nmsrnme[0]:
+                                print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" initial does not match\n')
+                                ROWWARN = "@CHECK@"
+                        elif len(nmsrnme) > 1 or len(nmsrnme[0]) > 2+len(srnm):
+                            if nm not in tmpe:
+                                print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" does not match\n')
+                                ROWWARN = "@CHECK@"
                         row.append(tmpe)
-                        ofile.write(f'{",".join(row)}\n')
+                        ofile.write(f'{ROWWARN}{",".join(row)}\n')
             l +=1 
 
     ofile.close()
@@ -131,19 +143,23 @@ def main():
     return
 
 def tryMatchRed(srnm, email):
+    global ROWWARN
     if len(srnm) > 7:
         if srnm[:7] in email:
             print(f'* Please cross-check: matched "{srnm}" abbreviated with {email}\n')
+            ROWWARN = '@CHECK@'
             return True
     return False
 
 def tryMatchSep(sep, srnm, email):
+    global ROWWARN
     sn = srnm.split(sep)
     m = 0
     for s in sn:
         if len(s) > 3:
             if s in email:
                 print(f'* Please cross-check: matched "{srnm}" composed with {email}\n')
+                ROWWARN = '@CHECK@'
                 m +=1
     if m == 1:
         return True
