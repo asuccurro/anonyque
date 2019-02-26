@@ -4,7 +4,7 @@
 #**email:asuccurro[AT]protonmail.com **
 #**                                  **
 #**    created:       2019/02/05     **
-#**    last modified: 2019/02/05     **
+#**    last modified: 2019/02/25     **
 #************************************
 
 import json
@@ -15,14 +15,21 @@ import string
 import unidecode
 
 ROWWARN=''
-
+VERBOSITY=0
 
 def main():
+    '''
+    Match names listed in the csv file "namesfile" (with columns Surname,Title,Firstname, index not hardcoded), with emails listed in the csv file "emailfile"
+    Runs without arguments, change the input/output file names directly in the code:
+    * emailfile
+    * namesfile
+    * ofile
+    '''
 
     global ROWWARN
     
-    emailfile = "../input/wggc_emails.csv"
-    namesfile = "../input/wggc_names.csv"
+    emailfile = "../../contacts/emails.csv"
+    namesfile = "../../contacts/names.csv"
 
     name_surname = []
     emails = []
@@ -33,13 +40,18 @@ def main():
     unmatched_names = []
     unmatched_emails = []
 
-    ofile = open("../output/wggc_matched_emails.csv", 'w')
+    ofile = open("../../contacts/matched_emails.csv", 'w')
     
     with open(emailfile) as infile:
         csvr = csv.reader(infile, delimiter=',')
+        l = 0
         for row in csvr:
-            emails.append(row[2].lower())
-
+            if l < 1:
+                k = row.index("Email")
+            else:
+                emails.append(row[k].lower())
+            l+=1
+                
     with open(namesfile) as infile:
         csvr = csv.reader(infile, delimiter=',')
         l=0
@@ -105,11 +117,13 @@ def main():
                         nmsrnme = tmpe.split('@')[0].split('.')
                         if len(nmsrnme[0]) == 1:
                             if nm[0] != nmsrnme[0]:
-                                print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" initial does not match\n')
+                                if VERBOSITY > 0:
+                                    print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" initial does not match\n')
                                 ROWWARN = "@CHECK@"
                         elif len(nmsrnme) > 1 or len(nmsrnme[0]) > 2+len(srnm):
                             if nm not in tmpe:
-                                print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" does not match\n')
+                                if VERBOSITY > 0:
+                                    print(f'* Please cross-check: matched "{nm_srnm}" with {tmpe}, "{nm}" does not match\n')
                                 ROWWARN = "@CHECK@"
                         row.append(tmpe)
                         ofile.write(f'{ROWWARN}{",".join(row)}\n')
@@ -146,7 +160,8 @@ def tryMatchRed(srnm, email):
     global ROWWARN
     if len(srnm) > 7:
         if srnm[:7] in email:
-            print(f'* Please cross-check: matched "{srnm}" abbreviated with {email}\n')
+            if VERBOSITY > 0:
+                print(f'* Please cross-check: matched "{srnm}" abbreviated with {email}\n')
             ROWWARN = '@CHECK@'
             return True
     return False
@@ -158,7 +173,8 @@ def tryMatchSep(sep, srnm, email):
     for s in sn:
         if len(s) > 3:
             if s in email:
-                print(f'* Please cross-check: matched "{srnm}" composed with {email}\n')
+                if VERBOSITY > 0:
+                    print(f'* Please cross-check: matched "{srnm}" composed with {email}\n')
                 ROWWARN = '@CHECK@'
                 m +=1
     if m == 1:
