@@ -50,9 +50,9 @@ Meaning that a user completed more than once the survey (zbm09u), one user used 
 
 Needs two independent people, A and B
 
-1. *A* generates from file `X.csv` the files `X_wIDs.csv` and `X_uniqueIDs.json`
+1. *A* generates from file `X.csv` (list of emails of the people that can vote / fill the survey) the files `X_wIDs.csv` and `X_uniqueIDs.json`
 2. *A* uses a mail merge program (e.g. Outlook, LibreOffice) to send to the emails in `X_wIDs.csv` their corresponding unique code
-3. *A* sends to *B* the file `X_uniqueIDs.json`
+3. *A* sends to *B* **only** the file `X_uniqueIDs.json`
 4. *B* creates a form online (e.g. Google Forms) with a field to enter the unique code and the questions to be answered / votes to be casted
 5. *B* collects form inputs
 6. *B* gets the list of codes entered in the survey and cross-checks with the `X_uniqueIDs.json`. If duplicates or invalid entries are found, *B* removes the faulty survey entries
