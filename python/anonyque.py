@@ -57,11 +57,17 @@ def checkunique(args):
 
     myidset = set(myids)
 
+    # First check for duplicates
+    duplicated = []
+    for ids in myidset:
+        if myids.count(ids) > 1:
+            duplicated.append(ids)
+    print(f'These IDs have multiple entries: {", ".join(duplicated)}')
+    
     # These are the ids that are not found among the valid ones
     notvalid = myidset - valididset
     print(f'These IDs are *not* valid: {", ".join(notvalid)}')
 
-    
     # These are the valid IDs that are not in the input file
     missing = valididset - myidset
     print(f'These IDs are valid and missing in the input: {", ".join(missing)}')
