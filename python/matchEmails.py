@@ -54,7 +54,7 @@ def main():
             else:
                 emails.append(row[k].lower())
             l+=1
-                
+
     with open(namesfile) as infile:
         csvr = csv.reader(infile, delimiter=',')
         l=0
@@ -115,6 +115,8 @@ def main():
                         else:
                             print(f'***WARNING*** {nm_srnm} matches more emails and could not univocally match name and surname\n')
                             print(srnm_emails[nm_srnm])
+                        ### TO DO: fix case when mail is duplicated! example: ['andreas.weber@uni-duesseldorf.de', 'aweber@hhu.de'] are the same person: andreas_weber
+                        ### but there is no warning about aweber@hhu.de being removed from list
                     else:
                         tmpe = srnm_emails[nm_srnm][0]
                         nmsrnme = tmpe.split('@')[0].split('.')
