@@ -28,8 +28,10 @@ def main():
 
     global ROWWARN
     
-    emailfile = "../../contacts/emails.csv"
-    namesfile = "../../contacts/names.csv"
+    #emailfile = "../../contacts/emails.csv"
+    #namesfile = "../../contacts/names.csv"
+    emailfile = "../../contacts/emails_20190906.csv"
+    namesfile = "../../contacts/names_20190906.csv"
 
     name_surname = []
     emails = []
@@ -40,7 +42,8 @@ def main():
     unmatched_names = []
     unmatched_emails = []
 
-    ofile = open("../../contacts/matched_emails.csv", 'w')
+    #ofile = open("../../contacts/matched_emails.csv", 'w')
+    ofile = open("../../contacts/matched_emails_20190906.csv", 'w')
     
     with open(emailfile) as infile:
         csvr = csv.reader(infile, delimiter=',')
