@@ -15,7 +15,7 @@ import string
 import unidecode
 
 ROWWARN=''
-VERBOSITY=0
+VERBOSITY=1
 
 def main():
     '''
@@ -30,8 +30,10 @@ def main():
     
     #emailfile = "../../contacts/emails.csv"
     #namesfile = "../../contacts/names.csv"
-    emailfile = "../../contacts/emails_20190906.csv"
-    namesfile = "../../contacts/names_20190906.csv"
+    #emailfile = "../../contacts/emails_20190906.csv"
+    #namesfile = "../../contacts/names_20190906.csv"
+    emailfile = "../../contacts/emails_20190913.csv"
+    namesfile = "../../contacts/names_20190913.csv"
 
     name_surname = []
     emails = []
@@ -43,7 +45,8 @@ def main():
     unmatched_emails = []
 
     #ofile = open("../../contacts/matched_emails.csv", 'w')
-    ofile = open("../../contacts/matched_emails_20190906.csv", 'w')
+    #ofile = open("../../contacts/matched_emails_20190906.csv", 'w')
+    ofile = open("../../contacts/matched_emails_20190913.csv", 'w')
     
     with open(emailfile) as infile:
         csvr = csv.reader(infile, delimiter=',')
@@ -66,8 +69,8 @@ def main():
                 ofile.write(f'{",".join(row)}\n')
             else:
                 ROWWARN=''
-                nm = row[kn].lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
-                srnm = row[ks].lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
+                nm = row[kn].lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue').replace(' ','-')
+                srnm = row[ks].lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue').replace(' ','-')
                 nm_srnm = f'{nm}_{srnm}'
                 if nm_srnm in name_surname:
                     print(f'***WARNING*** {nm_srnm} is duplicated! Quitting.\n')
@@ -86,6 +89,23 @@ def main():
                                 emails_srnm[e].append(nm_srnm)
                             else:
                                 emails_srnm[e] = [nm_srnm]
+                        # elif len(srnm.split('-')) > 1:
+                        #     tbmtc = len(srnm.split('-'))
+                        #     mtc = 0
+                        #     for srnms in srnm.split('-'):
+                        #         if srnms in e:
+                        #             mtc+=1
+                        #     if mtc > tbmtc/2.:
+                        #         match+=1
+                        #         if srnm_emails.get(nm_srnm, False):
+                        #             srnm_emails[nm_srnm].append(e)
+                        #         else:
+                        #             srnm_emails[nm_srnm] = [e]
+                        #         if emails_srnm.get(e, False):
+                        #             emails_srnm[e].append(nm_srnm)
+                        #         else:
+                        #             emails_srnm[e] = [nm_srnm]
+                                
                     if match < 1:
                         rematch = 0
                         for e in emails:
@@ -182,7 +202,7 @@ def tryMatchSep(sep, srnm, email):
                     print(f'* Please cross-check: matched "{srnm}" composed with {email}\n')
                 ROWWARN = '@CHECK@'
                 m +=1
-    if m == 1:
+    if m >= 1:
         return True
     
     return False
